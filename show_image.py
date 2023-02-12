@@ -33,14 +33,18 @@ class ShowImage(QWidget):
         self.open_dialog_box()
 
     def open_dialog_box(self):
-        file_name = QFileDialog.getOpenFileNames()
+        # getOpenFileNames возвращает список файлов, а нам нужен один
+        # getOpenFileName возвращает кортеж, но нам нужен его первый элемент
+        file_name, _ = QFileDialog.getOpenFileName()
         self.when_a_picture_is_selected(file_name)
 
     def when_a_picture_is_selected(self, file_name):
         self.pixmap = QPixmap(file_name)
-        self.image = QLabel(self)
-        self.image.move(0, 0)
-        self.image.resize(900, 50)
+        # image не нужно каждый раз создавать, он уже создан к конструкторе
+        # self.image = QLabel(self)
+        # self.image.move(0, 0)
+        # размер контрола устанавливаем согласно размеру картинки
+        self.image.resize(self.pixmap.width(), self.pixmap.height())
         self.image.setPixmap(self.pixmap)
 
 
