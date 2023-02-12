@@ -1,9 +1,9 @@
 import sys
 
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QMainWindow, QFileDialog, QGridLayout, \
-    QScrollArea
+    QScrollArea, QToolBar
 
 
 # Класс ShowImage является главным окном программы
@@ -40,6 +40,40 @@ class ShowImage(QMainWindow):
 
         grid.addWidget(self.header, 1, 0)
 
+        # панель инструментов
+        toolbar = QToolBar("Main toolbar")
+        toolbar.setIconSize(QSize(32, 32))
+        toolbar.setFixedHeight(32)
+        self.addToolBar(toolbar)
+
+        self.image_zoom = 1.0
+        self.zoom_plus = QPushButton(self)
+        self.zoom_plus.setGeometry(0, 0, 64, 32)
+        self.zoom_plus.setText(" + ")
+        self.zoom_plus.setStyleSheet("background-color:white;\n"
+                                     "border-style: outset;\n"
+                                     "border-width:2px;\n"
+                                     "border-radius:15px;\n"
+                                     "border-color:black;")
+        # lambda это такая локальная мини функция
+        # connect(self.change_zoom) нельзя, т.к. есть параметр - масштаб
+        # а писать отдельно change_zoom_plus, change_zoom_minus не обязятельно :)
+        self.zoom_plus.clicked.connect(lambda: self.change_zoom(1.2))
+
+        self.zoom_minus = QPushButton(self)
+        self.zoom_minus.setText(" - ")
+        self.zoom_minus.setStyleSheet("background-color:white;\n"
+                                      "border-style: outset;\n"
+                                      "border-width:2px;\n"
+                                      "border-radius:15px;\n"
+                                      "border-color:black;")
+        self.zoom_minus.clicked.connect(lambda: self.change_zoom(0.8))
+
+        # Двк кнопки на панели инструментов
+
+        toolbar.addWidget(self.zoom_plus)
+        toolbar.addWidget(self.zoom_minus)
+
         # Кнопка для выбора файла
         self.choice_image = QPushButton(self)
         self.choice_image.setGeometry(10, 450, 980, 40)
@@ -66,14 +100,25 @@ class ShowImage(QMainWindow):
 
         # отображение картинки на форме
 
-        self.image = QLabel(self)
-        self.image.move(0, 0)
+        self.image = QLabel()
 
-        self.scroll_area.setWidgetResizable(True)
+        self.image.setScaledContents(True)
+
         # контрол для картинки вносим в scroll_area
         self.scroll_area.setWidget(self.image)
 
         grid.addWidget(self.scroll_area, 2, 0)
+
+    def change_zoom(self, change_value):
+        new_zoom = self.image_zoom * change_value
+
+        if new_zoom > 100:
+            new_zoom = 100
+        elif new_zoom < 0.001:
+            new_zoom = 0.001
+        self.image_zoom = new_zoom
+
+        self.resize_image()
 
     def select_image_file(self):
         # getOpenFileName Return type:
@@ -90,8 +135,16 @@ class ShowImage(QMainWindow):
         self.header.setText(file_name)
         self.current = file_name
         self.pixmap.load(file_name)
-        self.image.resize(self.pixmap.width(), self.pixmap.height())
         self.image.setPixmap(self.pixmap)
+        self.resize_image()
+
+    def resize_image(self):
+        new_width = self.pixmap.width() * self.image_zoom
+        new_height = self.pixmap.height() * self.image_zoom
+
+        print(f"new_width = {new_width}, new_height = {new_height}")
+
+        self.image.resize(self.pixmap.size() * self.image_zoom)
 
 
 if __name__ == '__main__':
