@@ -116,7 +116,6 @@ def draw_info(frame, number, frame_w, frame_h, labels_path, suffix):
 
 
 def draw_on_video(src_video_path, output_video_path, labels_path):
-
     path_v = Path(src_video_path)
     suffix = path_v.stem
 
@@ -154,13 +153,17 @@ def draw_on_video(src_video_path, output_video_path, labels_path):
     input_video.release()
 
 
-def main():
+# пример запуска в питоне
+def run_example():
     src_video_path = "D:\\AI\\2023\\10.mp4"
     output_video_path = "D:\\AI\\2023\\10_out.mp4"
     labels_path = "D:\\AI\\2023\\Github\\yolov7\\runs\\detect\\exp10\\labels"
 
     draw_on_video(src_video_path, output_video_path, labels_path)
 
+
+# python.exe drawvideo.py --input "путь к входному видео" --output "результирующее видео" --labels "путь к
+# распознанной информации"
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -171,5 +174,3 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
     draw_on_video(opt.input, opt.output, opt.labels)
-
-
