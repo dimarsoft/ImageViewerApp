@@ -139,7 +139,7 @@ def draw_on_video(src_video_path, output_video_path, labels_path):
 
             draw_info(frame, frame_id, w, h, labels_path, suffix)
             output_video.write(frame)
-            cv2.imshow("output", frame)
+            # cv2.imshow("output", frame)
 
             frame_id += 1
 
@@ -151,6 +151,22 @@ def draw_on_video(src_video_path, output_video_path, labels_path):
     cv2.destroyAllWindows()
     output_video.release()
     input_video.release()
+
+
+def draw_folder(input_folder, output_folder, label_folder):
+    videos_path = Path(input_folder)
+
+    # iterate directory
+    for entry in videos_path.iterdir():
+        # check if it a file
+        if entry.is_file() and entry.suffix == ".mp4":
+            # print(entry.name, " ", entry.suffix)
+
+            videos_out_path = Path(output_folder) / f"{entry.stem}_post.mp4"
+
+            print("src = ", entry.name, ", output = ", str(videos_out_path))
+
+            draw_on_video(str(entry), str(videos_out_path), label_folder)
 
 
 # пример запуска в питоне
@@ -173,4 +189,9 @@ if __name__ == '__main__':
 
     opt = parser.parse_args()
 
-    draw_on_video(opt.input, opt.output, opt.labels)
+    input_path = Path(opt.input)
+
+    if input_path.is_dir():
+        draw_folder(opt.input, opt.output, opt.labels)
+    else:
+        draw_on_video(opt.input, opt.output, opt.labels)
